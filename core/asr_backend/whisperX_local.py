@@ -90,7 +90,20 @@ def transcribe_audio(raw_audio_file, vocal_audio_file, start, end):
         rprint(f"[green]📥 Using WHISPER model from HuggingFace:[/green] {model_name} ...")
 
     vad_options = {"vad_onset": 0.500,"vad_offset": 0.363}
-    asr_options = {"temperatures": [0],"initial_prompt": "",}
+    # 蓮ノ空專有名詞提示，全部使用日文表記引導 Whisper 輸出片假名，避免英文字母讓 wav2vec 截斷
+    HASU_PROMPT = (
+        "蓮ノ空女学院, 日野下花帆, 花帆, 村野さやか, さやか, 乙宗梢, 梢, 夕霧綴理, 綴理, "
+        "大沢瑠璃乃, 瑠璃乃, 藤島慈, 慈, 百生吟子, 吟子, 徒町小鈴, 小鈴, 安養寺姫芽, 姫芽, "
+        "セラス・柳田・リリエンフェルト, セラス, 桂城泉, 泉, 錦上マイカ, マイカ, 令沢葵, 葵, "
+        "紫輪みおん, みおん, 大賀美沙知, 沙知, スリーズブーケ, スリブ, ドルケストラ, ドルケ, "
+        "みらくらぱーく！, みらぱ, 蓮ノ大三角, エーデルノート, リンクラ, フェスライブ, "
+        "スクールアイドル, ウィズミーツ, ウィズステーション, ブルームガーデンパーティ, "
+        "楡井希実, 野中ここな, 花宮初奈, 佐々木琴子, 菅叶和, 月音こな, 櫻井陽菜, "
+        "葉山風花, 来栖りん, 三宅美羽, 進藤あまね, 小原好美, 星宮じゅりあ, 朝陽花菜, 湯浅かなえ, "
+        "のんちゅけ, うい様, なっす, こっちゃん, かんちゃん, こなち, ひーちゃん, ふーちゃん, "
+        "りんりん, みーちゃん, あまねす, せーはす"
+    )
+    asr_options = {"temperatures": [0], "initial_prompt": HASU_PROMPT,}
     whisper_language = None if 'auto' in WHISPER_LANGUAGE else WHISPER_LANGUAGE
     rprint("[bold yellow] You can ignore warning of `Model was trained with torch 1.10.0+cu102, yours is 2.0.0+cu118...`[/bold yellow]")
     model = whisperx.load_model(model_name, device, compute_type=compute_type, language=whisper_language, vad_options=vad_options, asr_options=asr_options, download_root=MODEL_DIR)
